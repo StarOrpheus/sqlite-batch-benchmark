@@ -1,0 +1,9 @@
+{
+  "name": "sqlite-batch-benchmark",
+  "version-string": "1.0",
+  "dependencies": [
+    "sqlitecpp",
+    "benchmark",
+    "sqlite3"
+  ]
+}
