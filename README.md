@@ -6,10 +6,14 @@ Consider using `vcpkg` to install dependencies
 
 | Benchmark                              | Time       | CPU        | Iterations |
 |----------------------------------------|------------|------------|------------|
-| BM_singleAddInstruction_noPrepare      | 1229701 ns | 1223272 ns | 518        |
-| BM_multiAddInstruction_noPrepare       | 5561057 ns | 5435578 ns | 128        |
-| BM_singleAddInstruction_preparedInsert | 581673 ns  | 571932 ns  | 1221       |
-| BM_multiAddInstruction_prepared8        | 2700249 ns | 2571682 ns | 274        |
+| BM_singleAddInstruction_noPrepare      | 1205605 ns | 1194327 ns | 523        |
+| BM_singleAddInstruction_preparedInsert | 575347 ns  | 562414 ns  | 1255       |
+| BM_multiAddInstruction_noPrepare       | 870137 ns  | 862669 ns  | 801        |
+| BM_multiAddInstruction_prepared8       | 528379 ns  | 519480 ns  | 1343       |
+| BM_multiAddInstruction_prepared16      | 507758 ns  | 500504 ns  | 1000       |
+| BM_multiAddInstruction_prepared32      | 502402 ns  | 495075 ns  | 1417       |
+
+Prepared statements + batch size = 32 gives about 15% speedup
 
 ## gcc + stdlib 9980HK 
 
