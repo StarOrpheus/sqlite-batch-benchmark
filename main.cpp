@@ -22,8 +22,8 @@ namespace {
     std::vector<row> generateData(auto &randDevice) {
         std::vector<row> result;
         std::uniform_int_distribution<int> someIntDistribution;
-        std::uniform_int_distribution<float> someFloatDistribution;
-        std::uniform_int_distribution<double> someDoubleDistribution;
+        std::uniform_real_distribution<float> someFloatDistribution;
+        std::uniform_real_distribution<double> someDoubleDistribution;
 
         for (size_t i = 0; i < N; ++i) {
             result.push_back({"/Users/family/Devel/vcpkg/scripts/buildsystems",
@@ -38,7 +38,6 @@ namespace {
         std::mt19937_64 device(SEED);
         auto data = generateData(device);
 
-        std::error_code ec;
         std::filesystem::path tmp_dir_path{std::filesystem::temp_directory_path() /= std::tmpnam(nullptr)};
         std::filesystem::create_directories(tmp_dir_path);
         auto dbPath = tmp_dir_path / "test.db";
@@ -88,7 +87,6 @@ namespace {
         std::mt19937_64 device(SEED);
         auto data = generateData(device);
 
-        std::error_code ec;
         std::filesystem::path tmp_dir_path{std::filesystem::temp_directory_path() /= std::tmpnam(nullptr)};
         std::filesystem::create_directories(tmp_dir_path);
         auto dbPath = tmp_dir_path / "test.db";
@@ -110,13 +108,14 @@ namespace {
                     ) strict
                 )sql");
 
-                for (size_t i = 0; i + 7 < data.size(); ++i) {
-                    #define singleInsert(idx) \
-                        insertQuery.bind(idx * 4 + 1, data[i + idx].path); \
-                        insertQuery.bind(idx * 4 + 2, data[i + idx].x); \
-                        insertQuery.bind(idx * 4 + 3, data[i + idx].y); \
-                        insertQuery.bind(idx * 4 + 4, data[i + idx].z);
-
+                for (size_t i = 0; i + 7 < data.size(); i += 8) {
+                    #define singleInsert(idx)                               \
+                        do {                                                \
+                        insertQuery.bind(idx * 4 + 1, data[i + idx].path);  \
+                        insertQuery.bind(idx * 4 + 2, data[i + idx].x);     \
+                        insertQuery.bind(idx * 4 + 3, data[i + idx].y);     \
+                        insertQuery.bind(idx * 4 + 4, data[i + idx].z);     \
+                        } while (0)
 
                     SQLite::Statement insertQuery(db,
                                                   "insert into test_table values "
@@ -134,6 +133,7 @@ namespace {
                     singleInsert(7);
 
                     insertQuery.exec();
+                    #undef singleInsert
                 }
 
                 db.exec("end transaction");
@@ -152,7 +152,6 @@ namespace {
         std::mt19937_64 device(SEED);
         auto data = generateData(device);
 
-        std::error_code ec;
         std::filesystem::path tmp_dir_path{std::filesystem::temp_directory_path() /= std::tmpnam(nullptr)};
         std::filesystem::create_directories(tmp_dir_path);
         auto dbPath = tmp_dir_path / "test.db";
@@ -204,7 +203,6 @@ namespace {
         std::mt19937_64 device(SEED);
         auto data = generateData(device);
 
-        std::error_code ec;
         std::filesystem::path tmp_dir_path{std::filesystem::temp_directory_path() /= std::tmpnam(nullptr)};
         std::filesystem::create_directories(tmp_dir_path);
         auto dbPath = tmp_dir_path / "test.db";
@@ -232,12 +230,14 @@ namespace {
                                               "(?, ?, ?, ?), (?, ?, ?, ?), (?, ?, ?, ?), "
                                               "(?, ?, ?, ?), (?, ?, ?, ?)");
 
-                for (size_t i = 0; i + 7 < data.size(); ++i) {
-#define singleInsert(idx) \
-                        insertQuery.bind(idx * 4 + 1, data[i + idx].path); \
-                        insertQuery.bind(idx * 4 + 2, data[i + idx].x); \
-                        insertQuery.bind(idx * 4 + 3, data[i + idx].y); \
-                        insertQuery.bind(idx * 4 + 4, data[i + idx].z);
+                for (size_t i = 0; i + 7 < data.size(); i += 8) {
+                    #define singleInsert(idx)                               \
+                        do {                                                \
+                        insertQuery.bind(idx * 4 + 1, data[i + idx].path);  \
+                        insertQuery.bind(idx * 4 + 2, data[i + idx].x);     \
+                        insertQuery.bind(idx * 4 + 3, data[i + idx].y);     \
+                        insertQuery.bind(idx * 4 + 4, data[i + idx].z);     \
+                        } while (0)
 
 
                     singleInsert(0);
@@ -251,6 +251,8 @@ namespace {
 
                     insertQuery.exec();
                     insertQuery.reset();
+
+                    #undef singleInsert
                 }
 
                 db.exec("end transaction");
